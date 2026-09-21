@@ -1,0 +1,369 @@
+{
+  "record": "ffmpeg-licence.json",
+  "schema": 2,
+  "written_utc": "2026-09-21T03:35:12Z",
+  "replaces": "the previous ffmpeg-licence.json, which described a superseded macOS build",
+  "licence": {
+    "ffmpeg": "LGPL-2.1-or-later",
+    "text": "LGPL-2.1.txt",
+    "third_party": "THIRD-PARTY-NOTICES.txt",
+    "gpl_or_nonfree_components": "none"
+  },
+  "source": {
+    "ffmpeg": {
+      "version": "7.1.5",
+      "url": "https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz",
+      "sha256": "de668509caf9e35e3cd162473441fdb29538c6d96ed080292b3cf9e6fc5d558f",
+      "licence": "LGPL-2.1-or-later"
+    },
+    "libopus": {
+      "version": "1.6.1",
+      "url": "https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz",
+      "sha256": "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1",
+      "licence": "BSD-3-Clause"
+    },
+    "libvpx": {
+      "version": "1.17.0",
+      "url": "https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz",
+      "sha256": "1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a",
+      "licence": "BSD-3-Clause"
+    },
+    "obligation": "Every shipped target was built from the one ffmpeg-7.1.5 tarball above. The LGPL requires that recipients can obtain this exact source; FFmpeg's legal checklist asks distributors to host it themselves beside the download rather than only linking to ffmpeg.org."
+  },
+  "targets": {
+    "aarch64-apple-darwin": {
+      "status": "shipped",
+      "ffmpeg": "7.1.5",
+      "programs": [
+        "ffmpeg-aarch64-apple-darwin",
+        "ffprobe-aarch64-apple-darwin"
+      ],
+      "library_dir": "lib-aarch64-apple-darwin",
+      "libraries_found_by": "install names @rpath/<name>; the programs carry LC_RPATH @executable_path/lib-aarch64-apple-darwin and each library carries @loader_path",
+      "must_stay_together": "the two programs and lib-aarch64-apple-darwin/ must remain siblings wherever they are installed",
+      "minimum_os": "macOS 11.0 (LC_BUILD_VERSION minos on every Mach-O)",
+      "toolchain": "Apple clang, macOS 27.0 SDK, on macOS 27.0 arm64",
+      "built_by": "build_ffmpeg_lgpl_macos v1.0.0 (build), v1.0.1 (repair and record)",
+      "configure": "--prefix=/tmp/ffmpeg-lgpl-build.vsc3jU/install-arm64 --enable-shared --disable-static --disable-gpl --disable-nonfree --disable-version3 --install-name-dir='@rpath' --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --enable-videotoolbox --enable-audiotoolbox --arch=arm64 --extra-cflags='-arch arm64 -mmacosx-version-min=11.0 -I/tmp/ffmpeg-lgpl-build.vsc3jU/deps-arm64/include' --extra-ldflags='-arch arm64 -mmacosx-version-min=11.0 -L/tmp/ffmpeg-lgpl-build.vsc3jU/deps-arm64/lib -headerpad_max_install_names' --enable-libvpx --enable-libopus",
+      "static_libraries": [
+        "libopus 1.6.1",
+        "libvpx 1.17.0"
+      ],
+      "licence_gates": {
+        "configure_reported": "License: LGPL version 2.1 or later",
+        "config_h": "CONFIG_GPL 0, CONFIG_NONFREE 0",
+        "binary_configure": "no --enable-gpl, --enable-nonfree, libx264, libx265 or libfdk"
+      },
+      "verification": {
+        "method": "static and on the build Mac",
+        "checks": [
+          "Mach-O load commands read directly: arm64, minos 11.0.0, code signature present, no dependency outside @rpath, /usr/lib and /System/Library",
+          "configure licence line and config.h gates observed in the build log supplied by the builder",
+          "clean-room execution is run by the repair script on the build Mac; its output is not captured here"
+        ]
+      },
+      "files": [
+        {
+          "path": "ffmpeg-aarch64-apple-darwin",
+          "sha256": "58821a3cc7409caa3e54571584fc89f3b336fde5fa0b2dc72598d94a64ed2db4",
+          "bytes": 370688
+        },
+        {
+          "path": "ffprobe-aarch64-apple-darwin",
+          "sha256": "5e3358b2fdab1130588a7348e46654e265e19da844a1d9995d3edd92e9cc2370",
+          "bytes": 267568
+        },
+        {
+          "path": "lib-aarch64-apple-darwin/libavcodec.61.dylib",
+          "sha256": "5d162dc69f296070db400bc29710f138dd28a80ebfa4d5e195607bd4cdfd5672",
+          "bytes": 15823520
+        },
+        {
+          "path": "lib-aarch64-apple-darwin/libavdevice.61.dylib",
+          "sha256": "e3d2eea06a53a4553c0663470a18362c245b58ff87038eccc34c46f09523188e",
+          "bytes": 114688
+        },
+        {
+          "path": "lib-aarch64-apple-darwin/libavfilter.10.dylib",
+          "sha256": "046cf48af9a34ec8dce1781a8c87b585650d70369f734d7f081060ec6d0e94a9",
+          "bytes": 3927248
+        },
+        {
+          "path": "lib-aarch64-apple-darwin/libavformat.61.dylib",
+          "sha256": "75f42a9bab8815ea69ba63237ac17ab92a863a76a3367d02b7fd949234060e8b",
+          "bytes": 2473744
+        },
+        {
+          "path": "lib-aarch64-apple-darwin/libavutil.59.dylib",
+          "sha256": "78ed8424177581aef4e55302631057e86f9fe6e47f615bb5aeacef18a9e98c83",
+          "bytes": 722384
+        },
+        {
+          "path": "lib-aarch64-apple-darwin/libswresample.5.dylib",
+          "sha256": "47176afc562ea09b9c07c6f5382af3733645d767bb31cd9fa632d2882e90207e",
+          "bytes": 136128
+        },
+        {
+          "path": "lib-aarch64-apple-darwin/libswscale.8.dylib",
+          "sha256": "64c454dfd1ad035876e9cd1235c1e901ca36493bdce6b08fb4aa4fa1bd8455d5",
+          "bytes": 794560
+        }
+      ]
+    },
+    "x86_64-apple-darwin": {
+      "status": "shipped",
+      "ffmpeg": "7.1.5",
+      "programs": [
+        "ffmpeg-x86_64-apple-darwin",
+        "ffprobe-x86_64-apple-darwin"
+      ],
+      "library_dir": "lib-x86_64-apple-darwin",
+      "libraries_found_by": "install names @rpath/<name>; the programs carry LC_RPATH @executable_path/lib-x86_64-apple-darwin and each library carries @loader_path",
+      "must_stay_together": "the two programs and lib-x86_64-apple-darwin/ must remain siblings wherever they are installed",
+      "minimum_os": "macOS 11.0 (LC_BUILD_VERSION minos on every Mach-O)",
+      "toolchain": "Apple clang, macOS 27.0.0 SDK, on macOS 27.0 arm64",
+      "cross_built": true,
+      "built_by": "build_ffmpeg_lgpl_macos v1.1.0",
+      "configure": "--prefix=/tmp/ffmpeg-lgpl-build.ezRnc3/install-x86_64 --enable-shared --disable-static --disable-gpl --disable-nonfree --disable-version3 --install-name-dir='@rpath' --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --enable-videotoolbox --enable-audiotoolbox --arch=x86_64 --extra-cflags='-arch x86_64 -mmacosx-version-min=11.0 -I/tmp/ffmpeg-lgpl-build.ezRnc3/deps-x86_64/include' --extra-ldflags='-arch x86_64 -mmacosx-version-min=11.0 -L/tmp/ffmpeg-lgpl-build.ezRnc3/deps-x86_64/lib -headerpad_max_install_names' --enable-libvpx --enable-libopus --enable-cross-compile",
+      "static_libraries": [
+        "libopus 1.6.1",
+        "libvpx 1.17.0"
+      ],
+      "licence_gates": {
+        "binary_configure": "no --enable-gpl, --enable-nonfree, libx264, libx265 or libfdk (read here from BUILDCONF.txt)",
+        "configure_reported_and_config_h": "enforced by build_ffmpeg_lgpl_macos v1.1.0 at build time, which refuses otherwise; not re-observed here"
+      },
+      "verification": {
+        "method": "executed",
+        "checks": [
+          "copied to a fresh directory and run with an empty environment on Darwin arm64 under Rosetta 2",
+          "ffmpeg version 7.1.5 Copyright (c) 2000-2026 the FFmpeg developers",
+          "mpeg4 clip encoded and read back as mpeg4,320,180",
+          "VP9 with alpha plus Opus encoded; 50%-opacity source decoded through libvpx-vp9 reads back alpha 127..127"
+        ]
+      },
+      "files": [
+        {
+          "path": "ffmpeg-x86_64-apple-darwin",
+          "sha256": "286c5a054124386e074589a296da40fbc3870bc82a06faec8a18713ff34c169a",
+          "bytes": 348256
+        },
+        {
+          "path": "ffprobe-x86_64-apple-darwin",
+          "sha256": "661bce6e4cfa012b9f318791b3ab1e7a2248326a904eacf610866cacabf65dd6",
+          "bytes": 240288
+        },
+        {
+          "path": "lib-x86_64-apple-darwin/libavcodec.61.dylib",
+          "sha256": "7d3ae2916e6a89fdd01093f795144f18d2cf91355b2bdc7f19cb913a4cc90565",
+          "bytes": 19839872
+        },
+        {
+          "path": "lib-x86_64-apple-darwin/libavdevice.61.dylib",
+          "sha256": "842e9c16442d8dd4bfc47885743c71c99bd5a59120e1d17d9d4ad3aea8868457",
+          "bytes": 90592
+        },
+        {
+          "path": "lib-x86_64-apple-darwin/libavfilter.10.dylib",
+          "sha256": "ecee537500a9b50712ea714dc2fdd764a412764ea23bb557768b6d8f6a48061b",
+          "bytes": 4637920
+        },
+        {
+          "path": "lib-x86_64-apple-darwin/libavformat.61.dylib",
+          "sha256": "c65ef7cb0dd65b4d1448fd9bfe8d93de101a83a51d583029495339e3dcd3f368",
+          "bytes": 2394432
+        },
+        {
+          "path": "lib-x86_64-apple-darwin/libavutil.59.dylib",
+          "sha256": "485c43b7cd2d993653e035742ee81e2ce668bb588abe9f5bd8aa9a76d7c08031",
+          "bytes": 855536
+        },
+        {
+          "path": "lib-x86_64-apple-darwin/libswresample.5.dylib",
+          "sha256": "d1d9539ebeb0f23880a8a7438fc4620ab74b1703bb56a0374548324d677b4e2c",
+          "bytes": 149952
+        },
+        {
+          "path": "lib-x86_64-apple-darwin/libswscale.8.dylib",
+          "sha256": "6bcdceb425989d0afb7291611b2a2322858c14c29fc5091f1b0f9122492889e2",
+          "bytes": 1061056
+        }
+      ]
+    },
+    "x86_64-unknown-linux-gnu": {
+      "status": "shipped",
+      "ffmpeg": "7.1.5",
+      "programs": [
+        "ffmpeg-x86_64-unknown-linux-gnu",
+        "ffprobe-x86_64-unknown-linux-gnu"
+      ],
+      "library_dir": "lib-x86_64-unknown-linux-gnu",
+      "libraries_found_by": "RUNPATH $ORIGIN/lib-x86_64-unknown-linux-gnu on the programs and $ORIGIN on each library",
+      "must_stay_together": "the two programs and lib-x86_64-unknown-linux-gnu/ must remain siblings wherever they are installed",
+      "minimum_os": "glibc 2.35 (highest GLIBC_ symbol version required)",
+      "system_libraries_needed": [
+        "libavcodec.so.61",
+        "libavdevice.so.61",
+        "libavfilter.so.10",
+        "libavformat.so.61",
+        "libavutil.so.59",
+        "libc.so.6",
+        "libm.so.6",
+        "libswresample.so.5",
+        "libswscale.so.8"
+      ],
+      "toolchain": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; NASM version 2.16.01",
+      "configure": "--prefix=/tmp/xbuild/install-linux --enable-shared --disable-static --disable-gpl --disable-nonfree --disable-version3 --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --disable-alsa --disable-sndio --pkg-config-flags=--static --enable-libvpx --enable-libopus --extra-cflags=-I/tmp/xbuild/deps-linux/include --extra-ldflags=-L/tmp/xbuild/deps-linux/lib",
+      "static_libraries": [
+        "libopus 1.6.1",
+        "libvpx 1.17.0"
+      ],
+      "licence_gates": {
+        "configure_reported": "License: LGPL version 2.1 or later",
+        "config_h": "CONFIG_GPL 0, CONFIG_NONFREE 0",
+        "binary_configure": "no --enable-gpl, --enable-nonfree, libx264, libx265 or libfdk"
+      },
+      "verification": {
+        "method": "executed",
+        "checks": [
+          "copied to a fresh directory, install tree moved out of reach, run under env -i with no LD_LIBRARY_PATH",
+          "ffmpeg and ffprobe both start and report 7.1.5",
+          "mpeg4 clip encoded and read back as mpeg4,320,180",
+          "VP9 with alpha plus Opus encoded to WebM; ffprobe reports vp9 with alpha_mode=1 and opus",
+          "50%-opacity source decoded through libvpx-vp9 reads back alpha 127 on every pixel"
+        ]
+      },
+      "files": [
+        {
+          "path": "ffmpeg-x86_64-unknown-linux-gnu",
+          "sha256": "52fed88e546ad53f941bffaf68298a5708490b3f6e17ef85233eada00b17284b",
+          "bytes": 387529
+        },
+        {
+          "path": "ffprobe-x86_64-unknown-linux-gnu",
+          "sha256": "8080aa14f420b4d5e6524c5ba85d7b474a124ce24716f90a96b3c4a493a25ec4",
+          "bytes": 220105
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libavcodec.so.61",
+          "sha256": "6e7c99b90eac36fb70ab69d7d53a306f2813f289f4169a8b7819313a1e689bfd",
+          "bytes": 18915137
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libavdevice.so.61",
+          "sha256": "25cd45ad82a747718d78bc9ee8f04a02fbb95ff34f0b470801f816e1314ec0ed",
+          "bytes": 68801
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libavfilter.so.10",
+          "sha256": "b4a81af7f29fa918f33a8111ff78f416c4620ed41c0881f3713e0867175a72aa",
+          "bytes": 4457377
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libavformat.so.61",
+          "sha256": "9baa995652405abe258902a1b6109d2fdc3bf426cd5a7d0d565bb8921ddf020f",
+          "bytes": 2753897
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libavutil.so.59",
+          "sha256": "590f675555308ed84c66a161a443dc6bef55d2662f12fcf853c5bd7050c95a14",
+          "bytes": 1018169
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libswresample.so.5",
+          "sha256": "8d78c95072996348517eb7054a176ad239477ec7195f68d48f4bd16ac562f28c",
+          "bytes": 125009
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libswscale.so.8",
+          "sha256": "a17ea3c2a1bf6a78a8f055cc46cb07626029ef21edde5efbb16d8b72e7e7e4fe",
+          "bytes": 624913
+        }
+      ]
+    },
+    "x86_64-pc-windows-msvc": {
+      "status": "shipped",
+      "ffmpeg": "7.1.5",
+      "programs": [
+        "ffmpeg-x86_64-pc-windows-msvc.exe",
+        "ffprobe-x86_64-pc-windows-msvc.exe"
+      ],
+      "library_dir": "lib-x86_64-pc-windows-msvc",
+      "libraries_found_by": "the Windows DLL search order; Windows has no rpath",
+      "must_stay_together": "at run time the seven DLLs must be in the same directory as the .exe, or that directory must be on the PATH of the spawned process",
+      "minimum_os": "not measured; PE subsystem version 5.2 as linked, and it imports bcrypt.dll, which Windows has had since Vista",
+      "toolchain": "x86_64-w64-mingw32-gcc (GCC) 13-win32 (cross-built on Linux); NASM version 2.16.01",
+      "configure": "--prefix=/tmp/xbuild/install-win --enable-shared --disable-static --disable-gpl --disable-nonfree --disable-version3 --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --disable-alsa --disable-sndio --pkg-config-flags=--static --enable-libvpx --enable-libopus --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- --enable-cross-compile --pkg-config=pkg-config --extra-cflags=-I/tmp/xbuild/deps-win/include --extra-ldflags=-L/tmp/xbuild/deps-win/lib",
+      "static_libraries": [
+        "libopus 1.6.1",
+        "libvpx 1.17.0",
+        "winpthreads (mingw-w64)"
+      ],
+      "build_notes": "winpthreads is linked statically into avcodec-61.dll by relinking with mingw-w64's import libraries unavailable, so the linker used libwinpthread.a; the configure line does not show this step. Without it the build needs libwinpthread-1.dll, which Windows does not have. The .lib import libraries are not shipped: nothing at run time uses them.",
+      "licence_gates": {
+        "configure_reported": "License: LGPL version 2.1 or later",
+        "config_h": "CONFIG_GPL 0, CONFIG_NONFREE 0",
+        "binary_configure": "no --enable-gpl, --enable-nonfree, libx264, libx265 or libfdk"
+      },
+      "verification": {
+        "method": "static only",
+        "checks": [
+          "PE x86-64 executables and DLLs",
+          "every imported DLL is one of the seven FFmpeg DLLs or a Windows system DLL",
+          "not executed: there is no Windows or Wine in the build environment"
+        ]
+      },
+      "files": [
+        {
+          "path": "ffmpeg-x86_64-pc-windows-msvc.exe",
+          "sha256": "a0841e8138f85b2802fdd314e529abd058055c5eb12c1e0bb996a570b3ff1865",
+          "bytes": 377344
+        },
+        {
+          "path": "ffprobe-x86_64-pc-windows-msvc.exe",
+          "sha256": "a29ca76d97edaf3fcfad1a6b18fcac2635ed7ec6a39ed72a9b8497f5f3307128",
+          "bytes": 204288
+        },
+        {
+          "path": "lib-x86_64-pc-windows-msvc/avcodec-61.dll",
+          "sha256": "26e66972a046eb156772fb5d8c86176e99a187bfe62eea33849bd9821c506c2d",
+          "bytes": 18829312
+        },
+        {
+          "path": "lib-x86_64-pc-windows-msvc/avdevice-61.dll",
+          "sha256": "41c3ef2b61e5dee4120f0dc070cc8b0733fdda1ff7b78f2dbb9e9e4102df15a9",
+          "bytes": 137216
+        },
+        {
+          "path": "lib-x86_64-pc-windows-msvc/avfilter-10.dll",
+          "sha256": "176dbb9903e4800508eb750901bf81a9fda6aeb66834b74742300b0a791d6a13",
+          "bytes": 4092928
+        },
+        {
+          "path": "lib-x86_64-pc-windows-msvc/avformat-61.dll",
+          "sha256": "16a3ecaac0424e2abcf8554c7bd8461bc928d46692327818aadb897dc06fafdc",
+          "bytes": 2557440
+        },
+        {
+          "path": "lib-x86_64-pc-windows-msvc/avutil-59.dll",
+          "sha256": "4b2833764bbcfe6fb0a5041d4ea10589407bd914ae22d529e6330baf658d82f9",
+          "bytes": 1034752
+        },
+        {
+          "path": "lib-x86_64-pc-windows-msvc/swresample-5.dll",
+          "sha256": "e58fa538dd3183feccfa6d71084810e26c4219dafe474e724990b15e74a1c000",
+          "bytes": 123392
+        },
+        {
+          "path": "lib-x86_64-pc-windows-msvc/swscale-8.dll",
+          "sha256": "d4421c909a2c8c37938b795970a0193982f0976af44c2934a0386962aa103932",
+          "bytes": 650752
+        }
+      ]
+    }
+  },
+  "documents": {
+    "LGPL-2.1.txt": "246041b6ecf9bc32d718a62c57877c78b5eb397b6467e74ed7ae2626ab189c30",
+    "THIRD-PARTY-NOTICES.txt": "f67c954bd97cf7ecaf2769c9b8ba14dc7aa54ea2ead5bda2600fd4836a06c5b5"
+  }
+}
