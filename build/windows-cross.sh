@@ -28,12 +28,17 @@ cd "$WORK"
 
 echo "== verifying the pinned sources against ffmpeg-licence.json"
 python3 - "$HERE" <<'PY'
-import hashlib, json, pathlib, sys
+import hashlib, json, pathlib, sys, urllib.request
 here = pathlib.Path(sys.argv[1])
 record = json.loads((here / "ffmpeg-licence.json").read_text())["source"]
 archives = {"ffmpeg": "ffmpeg-7.1.5.tar.xz", "libopus": "libopus-1.6.1.tar.gz", "libvpx": "libvpx-1.17.0.tar.gz"}
 for name, file in archives.items():
     archive = here / "dist" / file
+    if not archive.exists():
+        # dist/ is not in git; CI fetches from the recorded upstream, then verifies as below.
+        archive.parent.mkdir(exist_ok=True)
+        print(f"   {file}: fetching {record[name]['url']}")
+        urllib.request.urlretrieve(record[name]["url"], archive)
     digest = hashlib.sha256(archive.read_bytes()).hexdigest()
     if digest != record[name]["sha256"]:
         sys.exit(f"{archive.name}: sha256 {digest} is not the recorded {record[name]['sha256']}")
