@@ -1,0 +1,46 @@
+name: build
+
+# Builds the LGPL ffmpeg for Windows (cross-compiled with mingw-w64) and Linux
+# with the scripts in build/, on GitHub's multi-core runners, and uploads each
+# result for pack_release.py. Each script verifies the pinned sources, refuses a
+# configure that is not LGPL 2.1 or later, and checks the H.264 and HEVC
+# encoders it adds are built in. Ubuntu 22.04 keeps Linux at the shipped glibc
+# 2.35 floor.
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: sudo apt-get update && sudo apt-get install -y mingw-w64 nasm pkg-config make git
+      - name: Build
+        run: build/windows-cross.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-lgpl-7.1.5-x86_64-pc-windows-msvc
+          path: |
+            /tmp/xbuild/install-win/bin/
+            /tmp/xbuild/configure.out
+            /tmp/xbuild/nv-codec-headers.commit
+            /tmp/xbuild/amf.commit
+          if-no-files-found: error
+
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: sudo apt-get update && sudo apt-get install -y nasm pkg-config make patchelf git
+      - name: Build
+        run: build/linux.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-lgpl-7.1.5-x86_64-unknown-linux-gnu
+          path: |
+            /tmp/lbuild/stage/
+            /tmp/lbuild/configure.out
+            /tmp/lbuild/nv-codec-headers.commit
+          if-no-files-found: error
