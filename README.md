@@ -13,7 +13,7 @@ in the git history.
 
 ## What a release holds
 
-A release is tagged `ffmpeg-<version>`, for example `ffmpeg-7.1.5`, and carries:
+A release is tagged `ffmpeg-<release>`: the FFmpeg version, as in `ffmpeg-7.1.5`, or that version with a rebuild number when the same FFmpeg is built again, as in `ffmpeg-7.1.5-2`, so a published release is never replaced. The record's `release` field holds the name, and `update_record.py` writes it with each build's files. A release carries:
 
 | Asset | What it is |
 | --- | --- |

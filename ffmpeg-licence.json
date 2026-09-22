@@ -1,7 +1,7 @@
 {
   "record": "ffmpeg-licence.json",
   "schema": 2,
-  "written_utc": "2026-09-21T03:35:12Z",
+  "written_utc": "2026-09-22T19:12:48Z",
   "replaces": "the previous ffmpeg-licence.json, which described a superseded macOS build",
   "licence": {
     "ffmpeg": "LGPL-2.1-or-later",
@@ -28,7 +28,34 @@
       "sha256": "1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a",
       "licence": "BSD-3-Clause"
     },
-    "obligation": "Every shipped target was built from the one ffmpeg-7.1.5 tarball above. The LGPL requires that recipients can obtain this exact source; FFmpeg's legal checklist asks distributors to host it themselves beside the download rather than only linking to ffmpeg.org."
+    "obligation": "Every shipped target was built from the one ffmpeg-7.1.5 tarball above. The LGPL requires that recipients can obtain this exact source; FFmpeg's legal checklist asks distributors to host it themselves beside the download rather than only linking to ffmpeg.org.",
+    "libva": {
+      "version": "2.24.1",
+      "url": "https://github.com/intel/libva/releases/download/2.24.1/libva-2.24.1.tar.bz2",
+      "sha256": "eec6050b52876f229bd35e9df17cd31a06785e18e6f7990c445b584628483d67",
+      "licence": "MIT",
+      "shipped_as": "libva.so.2 and libva-drm.so.2, Linux only"
+    },
+    "libdrm": {
+      "version": "2.4.134",
+      "url": "https://dri.freedesktop.org/libdrm/libdrm-2.4.134.tar.xz",
+      "sha256": "ac5e74d157830eb8bee44c6a6bf3ad49774ef0dd2a72bdad74a8f20308b52a95",
+      "licence": "MIT",
+      "shipped_as": "libdrm.so.2, Linux only"
+    },
+    "nv-codec-headers": {
+      "version": "12.0.16.1",
+      "repository": "https://github.com/FFmpeg/nv-codec-headers",
+      "commit": "451da99614412a7f9526ef301a5ee0c7a6f9ad76",
+      "licence": "MIT",
+      "shipped_as": "headers compiled into libavcodec and libavutil, Windows and Linux"
+    },
+    "amf": {
+      "repository": "https://github.com/GPUOpen-LibrariesAndSDKs/AMF",
+      "commit": "6277e353fd625121a8f627b1d0540323ef372a49",
+      "licence": "MIT",
+      "shipped_as": "headers compiled into libavcodec and libavutil, Windows only"
+    }
   },
   "targets": {
     "aarch64-apple-darwin": {
@@ -202,18 +229,14 @@
       "must_stay_together": "the two programs and lib-x86_64-unknown-linux-gnu/ must remain siblings wherever they are installed",
       "minimum_os": "glibc 2.35 (highest GLIBC_ symbol version required)",
       "system_libraries_needed": [
-        "libavcodec.so.61",
-        "libavdevice.so.61",
-        "libavfilter.so.10",
-        "libavformat.so.61",
-        "libavutil.so.59",
+        "libbz2.so.1.0",
         "libc.so.6",
+        "liblzma.so.5",
         "libm.so.6",
-        "libswresample.so.5",
-        "libswscale.so.8"
+        "libz.so.1"
       ],
-      "toolchain": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; NASM version 2.16.01",
-      "configure": "--prefix=/tmp/xbuild/install-linux --enable-shared --disable-static --disable-gpl --disable-nonfree --disable-version3 --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --disable-alsa --disable-sndio --pkg-config-flags=--static --enable-libvpx --enable-libopus --extra-cflags=-I/tmp/xbuild/deps-linux/include --extra-ldflags=-L/tmp/xbuild/deps-linux/lib",
+      "toolchain": "GCC: (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0, Ubuntu 22.04 on GitHub Actions (build workflow, commit 44b91eb)",
+      "configure": "--prefix=/tmp/lbuild/install-linux --enable-shared --disable-static --disable-gpl --disable-nonfree --disable-version3 --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --disable-alsa --disable-sndio --pkg-config-flags=--static --enable-libvpx --enable-libopus --enable-ffnvcodec --enable-nvenc --enable-vaapi --extra-cflags=-I/tmp/lbuild/deps-linux/include --extra-ldflags=-L/tmp/lbuild/deps-linux/lib",
       "static_libraries": [
         "libopus 1.6.1",
         "libvpx 1.17.0"
@@ -226,58 +249,74 @@
       "verification": {
         "method": "executed",
         "checks": [
-          "copied to a fresh directory, install tree moved out of reach, run under env -i with no LD_LIBRARY_PATH",
-          "ffmpeg and ffprobe both start and report 7.1.5",
-          "mpeg4 clip encoded and read back as mpeg4,320,180",
-          "VP9 with alpha plus Opus encoded to WebM; ffprobe reports vp9 with alpha_mode=1 and opus",
-          "50%-opacity source decoded through libvpx-vp9 reads back alpha 127 on every pixel"
+          "ran ffmpeg -version from the shipped layout",
+          "h264_nvenc, hevc_nvenc, h264_vaapi and hevc_vaapi listed by ffmpeg -encoders",
+          "ldd: all ten libraries, libva, libva-drm and libdrm included, load from lib-x86_64-unknown-linux-gnu",
+          "RUNPATH $ORIGIN/lib-x86_64-unknown-linux-gnu on the programs and $ORIGIN on the libraries",
+          "highest glibc symbol GLIBC_2.35",
+          "a VP9 encode of 30 frames read back with ffprobe"
         ]
       },
       "files": [
         {
           "path": "ffmpeg-x86_64-unknown-linux-gnu",
-          "sha256": "52fed88e546ad53f941bffaf68298a5708490b3f6e17ef85233eada00b17284b",
-          "bytes": 387529
+          "sha256": "3d69dc24197a0d22cbc14228438c4ab9ff467dd24e45010841f30efb0ea610f1",
+          "bytes": 383392
         },
         {
           "path": "ffprobe-x86_64-unknown-linux-gnu",
-          "sha256": "8080aa14f420b4d5e6524c5ba85d7b474a124ce24716f90a96b3c4a493a25ec4",
-          "bytes": 220105
+          "sha256": "d960b1e97d28eef08abdc461699fc250e4d751761b513e26a2e73955259970ba",
+          "bytes": 215968
         },
         {
           "path": "lib-x86_64-unknown-linux-gnu/libavcodec.so.61",
-          "sha256": "6e7c99b90eac36fb70ab69d7d53a306f2813f289f4169a8b7819313a1e689bfd",
-          "bytes": 18915137
+          "sha256": "a055665593e70140f9392e7162766827c580282fc169697cb0788be10636d287",
+          "bytes": 17711648
         },
         {
           "path": "lib-x86_64-unknown-linux-gnu/libavdevice.so.61",
-          "sha256": "25cd45ad82a747718d78bc9ee8f04a02fbb95ff34f0b470801f816e1314ec0ed",
-          "bytes": 68801
+          "sha256": "e079c97aa5c81d6112e2d4b69a8dd2f843663094d1849b4f23781501ba9b45e8",
+          "bytes": 77296
         },
         {
           "path": "lib-x86_64-unknown-linux-gnu/libavfilter.so.10",
-          "sha256": "b4a81af7f29fa918f33a8111ff78f416c4620ed41c0881f3713e0867175a72aa",
-          "bytes": 4457377
+          "sha256": "0f44b5565e3ae3d5a9d27fa6e2ff2e2ea6c6dd14dcfa2f3a60e7d0782ffebb47",
+          "bytes": 4519256
         },
         {
           "path": "lib-x86_64-unknown-linux-gnu/libavformat.so.61",
-          "sha256": "9baa995652405abe258902a1b6109d2fdc3bf426cd5a7d0d565bb8921ddf020f",
-          "bytes": 2753897
+          "sha256": "86527012dc434a83823808453da66472df3c859b763854ad2573b922fea4f27c",
+          "bytes": 2733424
         },
         {
           "path": "lib-x86_64-unknown-linux-gnu/libavutil.so.59",
-          "sha256": "590f675555308ed84c66a161a443dc6bef55d2662f12fcf853c5bd7050c95a14",
-          "bytes": 1018169
+          "sha256": "4c65e32eb4f806633ff9370013f3c649a0c849c133d595bfa3a9490f6771bd89",
+          "bytes": 1067936
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libdrm.so.2",
+          "sha256": "cdce5fe2f157f623f90e6ff3bd99e74d46568b6d9afcd0c9eecc8e3d41bfeb2f",
+          "bytes": 330504
         },
         {
           "path": "lib-x86_64-unknown-linux-gnu/libswresample.so.5",
-          "sha256": "8d78c95072996348517eb7054a176ad239477ec7195f68d48f4bd16ac562f28c",
-          "bytes": 125009
+          "sha256": "b41ebec6de028e67a1e450f3d3a2ae9a13ba2aaa838c8658b25f0887f417de2e",
+          "bytes": 125008
         },
         {
           "path": "lib-x86_64-unknown-linux-gnu/libswscale.so.8",
-          "sha256": "a17ea3c2a1bf6a78a8f055cc46cb07626029ef21edde5efbb16d8b72e7e7e4fe",
-          "bytes": 624913
+          "sha256": "7c831badc3a05759bc70bca19a2a500e0eac753b2ff93d540f7360035fbd69c7",
+          "bytes": 616696
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libva-drm.so.2",
+          "sha256": "197d126a11deaefdd24eb0de94d83547f04e0ff39cc7b44b12c15ef61834e300",
+          "bytes": 50696
+        },
+        {
+          "path": "lib-x86_64-unknown-linux-gnu/libva.so.2",
+          "sha256": "a3a7746c58252d0318dad512fce3b7dea485e49119083f3da8164a7fea4d605c",
+          "bytes": 814648
         }
       ]
     },
@@ -292,8 +331,8 @@
       "libraries_found_by": "the Windows DLL search order; Windows has no rpath",
       "must_stay_together": "at run time the seven DLLs must be in the same directory as the .exe, or that directory must be on the PATH of the spawned process",
       "minimum_os": "not measured; PE subsystem version 5.2 as linked, and it imports bcrypt.dll, which Windows has had since Vista",
-      "toolchain": "x86_64-w64-mingw32-gcc (GCC) 13-win32 (cross-built on Linux); NASM version 2.16.01",
-      "configure": "--prefix=/tmp/xbuild/install-win --enable-shared --disable-static --disable-gpl --disable-nonfree --disable-version3 --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --disable-alsa --disable-sndio --pkg-config-flags=--static --enable-libvpx --enable-libopus --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- --enable-cross-compile --pkg-config=pkg-config --extra-cflags=-I/tmp/xbuild/deps-win/include --extra-ldflags=-L/tmp/xbuild/deps-win/lib",
+      "toolchain": "x86_64-w64-mingw32-gcc GCC: (GNU) 13-win32, mingw-w64 11.0.1, cross-built on Ubuntu 24.04 on GitHub Actions (build workflow, commit 44b91eb)",
+      "configure": "--prefix=/tmp/xbuild/install-win --enable-shared --disable-static --disable-gpl --disable-nonfree --disable-version3 --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --disable-alsa --disable-sndio --pkg-config-flags=--static --enable-libvpx --enable-libopus --enable-mediafoundation --enable-ffnvcodec --enable-nvenc --enable-amf --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- --enable-cross-compile --pkg-config=pkg-config --extra-cflags=-I/tmp/xbuild/deps-win/include --extra-ldflags='-L/tmp/xbuild/static-pthread -L/tmp/xbuild/deps-win/lib'",
       "static_libraries": [
         "libopus 1.6.1",
         "libvpx 1.17.0",
@@ -306,64 +345,80 @@
         "binary_configure": "no --enable-gpl, --enable-nonfree, libx264, libx265 or libfdk"
       },
       "verification": {
-        "method": "static only",
+        "method": "inspected",
         "checks": [
-          "PE x86-64 executables and DLLs",
-          "every imported DLL is one of the seven FFmpeg DLLs or a Windows system DLL",
-          "not executed: there is no Windows or Wine in the build environment"
+          "configure reported LGPL version 2.1 or later",
+          "h264_mf, hevc_mf, h264_nvenc, hevc_nvenc, h264_amf and hevc_amf enabled and present in avcodec-61.dll",
+          "PE32+ x86-64 throughout",
+          "imports only Windows system DLLs and its own: no libwinpthread-1.dll, and Media Foundation, NVENC and AMF loaded at run time rather than imported"
         ]
       },
       "files": [
         {
           "path": "ffmpeg-x86_64-pc-windows-msvc.exe",
-          "sha256": "a0841e8138f85b2802fdd314e529abd058055c5eb12c1e0bb996a570b3ff1865",
+          "sha256": "842ed489ba43db2deb4386f821a583e44765554a335ceb2f52a2ad1828920006",
           "bytes": 377344
         },
         {
           "path": "ffprobe-x86_64-pc-windows-msvc.exe",
-          "sha256": "a29ca76d97edaf3fcfad1a6b18fcac2635ed7ec6a39ed72a9b8497f5f3307128",
-          "bytes": 204288
+          "sha256": "7b6401a2d0f1bb92b0017c3c9a60d99d4530309591614128a249f34ffc7f95d2",
+          "bytes": 204800
         },
         {
           "path": "lib-x86_64-pc-windows-msvc/avcodec-61.dll",
-          "sha256": "26e66972a046eb156772fb5d8c86176e99a187bfe62eea33849bd9821c506c2d",
-          "bytes": 18829312
+          "sha256": "87bd9679bd98d5280341a9f8bc6cf520e66cb05dba5f067fe8e992471724dcec",
+          "bytes": 17740288
         },
         {
           "path": "lib-x86_64-pc-windows-msvc/avdevice-61.dll",
-          "sha256": "41c3ef2b61e5dee4120f0dc070cc8b0733fdda1ff7b78f2dbb9e9e4102df15a9",
+          "sha256": "76348cb9eabab6799c70355184623d6b9c11972b1857692ee76866ed4486141a",
           "bytes": 137216
         },
         {
           "path": "lib-x86_64-pc-windows-msvc/avfilter-10.dll",
-          "sha256": "176dbb9903e4800508eb750901bf81a9fda6aeb66834b74742300b0a791d6a13",
-          "bytes": 4092928
+          "sha256": "479fcde9aded8f3307a1f4292ae7484b67235dd5c6a8d287dd98325e2215019b",
+          "bytes": 6840320
         },
         {
           "path": "lib-x86_64-pc-windows-msvc/avformat-61.dll",
-          "sha256": "16a3ecaac0424e2abcf8554c7bd8461bc928d46692327818aadb897dc06fafdc",
-          "bytes": 2557440
+          "sha256": "f17d8f99fb5dbbcb98bec2d860859734c4523b80747b525daaef3eb2f4036d07",
+          "bytes": 2556928
         },
         {
           "path": "lib-x86_64-pc-windows-msvc/avutil-59.dll",
-          "sha256": "4b2833764bbcfe6fb0a5041d4ea10589407bd914ae22d529e6330baf658d82f9",
-          "bytes": 1034752
+          "sha256": "2bd68edeb5507c40d32f36a784ae529b519d6996605ba2739e65e6131e576e1c",
+          "bytes": 1051648
         },
         {
           "path": "lib-x86_64-pc-windows-msvc/swresample-5.dll",
-          "sha256": "e58fa538dd3183feccfa6d71084810e26c4219dafe474e724990b15e74a1c000",
+          "sha256": "5bfdf8dba05ca916b985ce07532c9f03e59f0777d1fd2d1cafe65dd88e5a0a06",
           "bytes": 123392
         },
         {
           "path": "lib-x86_64-pc-windows-msvc/swscale-8.dll",
-          "sha256": "d4421c909a2c8c37938b795970a0193982f0976af44c2934a0386962aa103932",
+          "sha256": "0231c1f6eedbdbdcf06a964c28d25d1a1f214f5860494901d52fa2fc2aa851f9",
           "bytes": 650752
         }
+      ],
+      "system_libraries_needed": [
+        "AVICAP32.dll",
+        "bcrypt.dll",
+        "GDI32.dll",
+        "KERNEL32.dll",
+        "msvcrt.dll",
+        "ole32.dll",
+        "OLEAUT32.dll",
+        "Secur32.dll",
+        "SHELL32.dll",
+        "SHLWAPI.dll",
+        "USER32.dll",
+        "WS2_32.dll"
       ]
     }
   },
   "documents": {
     "LGPL-2.1.txt": "246041b6ecf9bc32d718a62c57877c78b5eb397b6467e74ed7ae2626ab189c30",
-    "THIRD-PARTY-NOTICES.txt": "f67c954bd97cf7ecaf2769c9b8ba14dc7aa54ea2ead5bda2600fd4836a06c5b5"
-  }
+    "THIRD-PARTY-NOTICES.txt": "b0e7f25e1c096dd262c7d0253641008cdc5203a1c36cf419aed62b252ead7c1b"
+  },
+  "release": "7.1.5-2"
 }
