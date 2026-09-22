@@ -11,7 +11,10 @@ on:
 
 jobs:
   windows:
-    runs-on: ubuntu-22.04
+    # Ubuntu 22.04's mingw-w64 (8.0) lacks mftransform.h, so ffmpeg's configure
+    # refuses Media Foundation there; 24.04's (11.0) has it. A Windows build does
+    # not depend on the runner's glibc, so only the Linux job needs 22.04.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Toolchain

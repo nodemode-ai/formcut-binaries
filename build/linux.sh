@@ -89,7 +89,8 @@ PKG_CONFIG_PATH="$DEPS/lib/pkgconfig" ./configure \
   --enable-pic --disable-debug --disable-doc --disable-ffplay --disable-sdl2 --disable-xlib --disable-libxcb \
   --disable-libxcb-shm --disable-libxcb-xfixes --disable-libxcb-shape --disable-alsa --disable-sndio \
   --pkg-config-flags=--static --enable-libvpx --enable-libopus --enable-ffnvcodec --enable-nvenc --enable-vaapi \
-  --extra-cflags="-I$DEPS/include" --extra-ldflags="-L$DEPS/lib" > "$WORK/configure.out"
+  --extra-cflags="-I$DEPS/include" --extra-ldflags="-L$DEPS/lib" > "$WORK/configure.out" 2>&1 \
+  || { echo "ffmpeg's configure failed:"; tail -n 25 "$WORK/configure.out"; echo "--- end of ffbuild/config.log:"; tail -n 40 ffbuild/config.log; exit 1; }
 grep -q "License: LGPL version 2.1 or later" "$WORK/configure.out" || { echo "configure did not report LGPL 2.1 or later"; exit 1; }
 grep -qE "^#define CONFIG_(GPL|NONFREE) 1" config.h && { echo "config.h enables GPL or nonfree code"; exit 1; }
 make -j"$JOBS" >/dev/null
