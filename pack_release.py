@@ -99,7 +99,7 @@ def fetch_sources(record: dict, out: Path) -> list[Path]:
     for key, source in record.get("source", {}).items():
         if not isinstance(source, dict) or not source.get("url") or not source.get("sha256"):
             continue
-        suffix = ".tar.xz" if source["url"].endswith(".tar.xz") else ".tar.gz"
+        suffix = next((ending for ending in (".tar.xz", ".tar.bz2", ".tar.gz") if source["url"].endswith(ending)), ".tar.gz")
         target = out / f"{key}-{source.get('version', 'source')}{suffix}"
         print(f"  downloading {source['url']}")
         with urllib.request.urlopen(source["url"], timeout=120) as response, target.open("wb") as handle:  # noqa: S310 - fixed https URLs from the record
@@ -144,7 +144,10 @@ def main() -> int:
     for document, expected in record.get("documents", {}).items():
         if digest(HERE / document) != expected:
             raise SystemExit(f"{document} here does not match the record")
-    version = record["source"]["ffmpeg"]["version"]
+    # The release name tags the GitHub release and names its archives; a rebuild
+    # of the same FFmpeg gets its own (7.1.5-2) so a published release, which
+    # formcut pins, is never replaced. Without one, the FFmpeg version serves.
+    version = record.get("release") or record["source"]["ffmpeg"]["version"]
     args.out.mkdir(parents=True, exist_ok=True)
     packed, skipped = [], []
     for triple, target in record["targets"].items():
